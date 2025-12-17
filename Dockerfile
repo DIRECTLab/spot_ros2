@@ -42,6 +42,13 @@ RUN apt-get update -q && \
     qttools5-dev \
     ros-humble-ros-base \
     ros-dev-tools \
+    # Install navigation and SLAM packages
+    ros-humble-rviz2 \
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    ros-humble-slam-toolbox \
+    ros-humble-rplidar-ros \
+
     #check if Zenoh should be installed
     $(if [ "$EXPERIMENTAL_ZENOH_RMW" = "TRUE" ]; then echo "ros-humble-rmw-zenoh-cpp"; fi) \
     && rm -rf /var/lib/apt/lists/*
