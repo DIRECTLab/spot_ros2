@@ -7,6 +7,8 @@ ARG EXPERIMENTAL_ZENOH_RMW=FALSE
 # Set noninteractive mode for APT
 ENV DEBIAN_FRONTEND=noninteractive
 
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
 # Env setup
 ENV SHELL=/bin/bash
 SHELL ["/bin/bash", "-c"]
@@ -29,7 +31,10 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o 
 # Install dependencies
 RUN apt-get update -q && \
     apt-get install -yq --no-install-recommends \
-    wget \ 
+    # Basic tools
+    wget \
+    vim \
+    tmux \ 
     software-properties-common \ 
     python3-pip \
     python-is-python3 \
@@ -38,16 +43,24 @@ RUN apt-get update -q && \
     python3-colcon-mixin \
     python3-rosdep \
     libpython3-dev \
+    # Image tools
+    zlib1g-dev \
+    libjpeg-dev \
+    libpng-dev \
     python3-tk \
     qttools5-dev \
+    # ROS 2 Humble base packages
     ros-humble-ros-base \
     ros-dev-tools \
-    # Install navigation and SLAM packages
     ros-humble-rviz2 \
+    # Install navigation and SLAM packages
     ros-humble-navigation2 \
     ros-humble-nav2-bringup \
     ros-humble-slam-toolbox \
     ros-humble-rplidar-ros \
+    ros-humble-cv-bridge \
+    ros-humble-rmw-cyclonedds-cpp \
+
 
     #check if Zenoh should be installed
     $(if [ "$EXPERIMENTAL_ZENOH_RMW" = "TRUE" ]; then echo "ros-humble-rmw-zenoh-cpp"; fi) \
@@ -70,3 +83,8 @@ RUN ARCH=$(dpkg --print-architecture) && echo "Building driver with $ARCH" && /r
 WORKDIR /ros_ws/
 RUN . /opt/ros/humble/setup.sh && \
     colcon build --symlink-install
+
+# Source the workspace on sign in
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
+    echo "source /ros_ws/install/setup.bash" >> /root/.bashrc
+
